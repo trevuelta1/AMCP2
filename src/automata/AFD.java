@@ -4,8 +4,14 @@
  */
 package automata;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -76,8 +82,56 @@ public class AFD {
         }
     }
     
-    public static AFD leeFichero(){
-        return null;
+    public static AFD leeFichero() throws FileNotFoundException, IOException{
+        AFD solucion;
+        FileReader fr;
+        String url;
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Escribe la ruta del fichero que deseas utilizar: ");
+        url = sc.next();
+        fr = new FileReader(url);
+        BufferedReader br = new BufferedReader(fr);
+        String line = "";
+        line = br.readLine();
+        String[] tipo = new String[2];
+        tipo = line.split(":");
+        if(tipo[0].equals("TIPO") == false || tipo[1].equals("AFD") == false){
+            solucion = null;
+        } else{
+            line = br.readLine();
+            ArrayList<String> estados = new ArrayList();
+            String[] est = line.split(":");
+            est = est[1].split(" ");
+            for(int i = 0; i < est.length; i++){
+                estados.add(est[i].trim());
+            }
+            line = br.readLine();
+            String eini = line.split(":")[1].trim();
+            line = br.readLine();
+            ArrayList<String> efinales = new ArrayList();
+            String[] estfin = line.split(":");
+            estfin = estfin[1].split(" ");
+            for(int i = 0; i < estfin.length; i++){
+                efinales.add(estfin[i].trim());
+            }
+            br.readLine();
+            solucion = new AFD(estados, eini, efinales, new ArrayList<TransicionAFD>());
+            boolean b = false;
+            while(b == false){
+                line = br.readLine();
+                if ("FIN".equals(line)) {
+                    b = true;
+                } else {
+                    String[] datos = line.split(" ");
+                    String e1 = datos[0].trim();
+                    String simbol = datos[1].trim();
+                    char sim = simbol.toCharArray()[1];
+                    String e2 = datos[2].trim();
+                    solucion.agregarTransicion(e1, sim, e2);
+                }
+            }
+        }
+        return solucion;
     }
 
     public static AFD pedir() {
@@ -211,9 +265,14 @@ public class AFD {
                     break;
                 }
                 case 2: {
-                    afd = leeFichero();
-                    break;
+                    try {
+                        afd = leeFichero();
+                        break;
+                    } catch (IOException ex) {
+                        Logger.getLogger(AFD.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
+
                 default: {
                     break;
                 }

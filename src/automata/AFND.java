@@ -4,8 +4,14 @@
  */
 package automata;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -26,116 +32,73 @@ public class AFND {
         this.macroestadoFinal = macroestadoFinal;
         this.transiciones = transiciones;
         this.transicioneslambda = transicionesLambda;
-        this.macroestadoInicial = new ArrayList();
-        this.macroestadoInicial.add(this.estadoInicial);
-        int i = 0;
-        boolean b = false;
-        while (i < this.transicioneslambda.size() && b == false) {
-            if (this.transicioneslambda.get(i).getEstadoInicial().equals(this.estadoInicial) == true) {
-                for (String s : this.transicioneslambda.get(i).getMacroestadoFinal()) {
-                    this.macroestadoInicial.add(s);
-                }
-                b = true;
-            } else {
-                i++;
-            }
-        }
+        this.macroestadoInicial = transicionlambda(this.estadoInicial);
     }
 
     public ArrayList<String> transicion(String eini, char sim) {
         ArrayList<String> macroestado = new ArrayList();
         macroestado.add(eini);
-        int ind = 0;
-        boolean encontrado = false;
-        while (ind < this.transicioneslambda.size() && encontrado == false) {
-            if (this.transicioneslambda.get(ind).getEstadoInicial().equals(eini) == true) {
-                for (String s : this.transicioneslambda.get(ind).getMacroestadoFinal()) {
-                    macroestado.add(s);
-                }
-                encontrado = true;
-            } else {
-                ind++;
-            }
-        }
         return transicion(macroestado, sim);
     }
 
     public ArrayList<String> transicion(ArrayList<String> eini, char sim) {
         ArrayList<String> solucion = new ArrayList();
+        ArrayList<String> macroestado = transicionlambda(eini);
         ArrayList<String> añadidos = new ArrayList(); //evita duplicados en solucion
         boolean existe = false;
-        for (String e : eini) {
-            ArrayList<String> macroestado = new ArrayList();
-            macroestado.add(e);
-            int ind = 0;
-            boolean encontrado = false;
-            while (ind < this.transicioneslambda.size() && encontrado == false) {
-                if (this.transicioneslambda.get(ind).getEstadoInicial().equals(e) == true) {
-                    for (String s : this.transicioneslambda.get(ind).getMacroestadoFinal()) {
-                        macroestado.add(s);
-                    }
-                    encontrado = true;
-                } else {
-                    ind++;
-                }
+        int i = 0;
+        boolean b = false;
+        boolean existesimbolo = false;
+        while (i < this.transiciones.size() && b == false) {
+            TransicionAFND t = this.transiciones.get(i);
+            if(sim == t.getSimbolo()){
+                existesimbolo = true;
             }
-            int i = 0;
-            boolean b = false;
-            while (i < this.transiciones.size() && b == false) {
-                TransicionAFND t = this.transiciones.get(i);
-                for (String m : macroestado) {
-                    if (t.getEstadoInicial().equals(m) == true && t.getSimbolo() == sim) {
-                        for (String s : t.getMacroestadoFinal()) {
-                            boolean a = false;
-                            if (añadidos.isEmpty() == false) {
-                                int j = 0;
-                                while (j < añadidos.size() && a == false) {
-                                    if (añadidos.get(j).equals(s) == true) {
-                                        a = true;
-                                    } else {
-                                        j++;
-                                    }
+            for (String m : macroestado) {
+                if (t.getEstadoInicial().equals(m) == true && t.getSimbolo() == sim) {
+                    for (String s : t.getMacroestadoFinal()) {
+                        boolean a = false;
+                        if (añadidos.isEmpty() == false) {
+                            int j = 0;
+                            while (j < añadidos.size() && a == false) {
+                                if (añadidos.get(j).equals(s) == true) {
+                                    a = true;
+                                } else {
+                                    j++;
                                 }
                             }
-                            if (a == false) {
-                                solucion.add(s);
-                                añadidos.add(s);
-                            }
                         }
-                        b = true;
-                        existe = true;
-                    } else {
-                        i++;
+                        if (a == false) {
+                            solucion.add(s);
+                            añadidos.add(s);
+                        }
                     }
+                    b = true;
+                    existe = true;
+                } else {
+                    i++;
                 }
             }
         }
         if (existe == false) {
             solucion = null;
+        } else if(existesimbolo == false){
+            solucion = null;
+        } else{
+            solucion = transicionlambda(solucion);
         }
         return solucion;
     }
 
     public ArrayList<String> transicionlambda(String eini) {
-        int i = 0;
-        boolean b = false;
-        ArrayList<String> solucion = null;
-        while (i < this.transicioneslambda.size() && b == false) {
-            TransicionLambda t = this.transicioneslambda.get(i);
-            if (t.getEstadoInicial().equals(eini) == true) {
-                solucion = t.getMacroestadoFinal();
-                b = true;
-            } else {
-                i++;
-            }
-        }
-        return solucion;
+        ArrayList<String> est = new ArrayList();
+        est.add(eini);
+        return transicionlambda(est);
     }
 
     public ArrayList<String> transicionlambda(ArrayList<String> eini) {
         ArrayList<String> solucion = new ArrayList();
         solucion.addAll(eini);
-        boolean existe = false;
         boolean repetir = true;
         int tinicial = solucion.size();
         int tfinal = tinicial * 2;
@@ -152,7 +115,6 @@ public class AFND {
                             solucion.add(s);
                         }
                         b = true;
-                        existe = true;
                     } else {
                         i++;
                     }
@@ -181,9 +143,6 @@ public class AFND {
             if (tinicial == tfinal) {
                 repetir = false;
             }
-        }
-        if (existe == false) {
-            solucion = null;
         }
         return solucion;
     }
@@ -276,8 +235,8 @@ public class AFND {
     public boolean esFinal(ArrayList<String> macroestado) {
         boolean b = false;
         int i = 0;
-        while (b == false && i < this.macroestadoFinal.size()) {
-            if (esFinal(this.macroestadoFinal.get(i)) == true) {
+        while (b == false && i < macroestado.size()) {
+            if (esFinal(macroestado.get(i)) == true) {
                 b = true;
             } else {
                 i++;
@@ -289,14 +248,127 @@ public class AFND {
     public boolean reconocer(String cadena) {
         char[] simbolo = cadena.toCharArray();
         ArrayList<String> macroestado = this.macroestadoInicial;
-        for (int i = 0; i < simbolo.length; i++) {
+        int i = 0;
+        boolean error = false;
+        while(i < simbolo.length && error == false){
             macroestado = transicion(macroestado, simbolo[i]);
+            if(macroestado == null){
+                error = true;
+            }
         }
-        return esFinal(macroestado);
+        if(error == true){
+            System.out.println("CADENA CON CARACTERES NO VÁLIDOS.");
+            return false;
+        } else{
+            boolean fin = esFinal(macroestado);
+            if(fin == true){
+                System.out.println("CADENA ACEPTADA.");
+            } else{
+                System.out.println("CADENA RECHAZADA.");
+            }
+            return fin;
+        }
+    }
+    
+    public boolean reconocerPasoAPaso(String cadena) {
+        char[] simbolo = cadena.toCharArray();
+        ArrayList<String> macroestado = this.macroestadoInicial;
+        int i = 0;
+        boolean error = false;
+        while(i < simbolo.length && error == false){
+            macroestado = transicion(macroestado, simbolo[i]);
+            if(macroestado == null){
+                error = true;
+            }
+            if(error == false){
+                System.out.println("Símbolo: '" + simbolo[i] + "'.");
+                System.out.println("Estados accesibles:");
+                System.out.println(macroestado);
+            } else{
+                System.out.println("CADENA CON CARACTERES NO VÁLIDOS.");
+            }
+        }
+        if(error == true){
+            return false;
+        } else{
+            boolean fin = esFinal(macroestado);
+            if(fin == true){
+                System.out.println("CADENA ACEPTADA.");
+            } else{
+                System.out.println("CADENA RECHAZADA.");
+            }
+            return fin;
+        }
     }
 
-    public static AFND leeFichero() {
-        return null;
+    public static AFND leeFichero() throws FileNotFoundException, IOException {
+        AFND solucion;
+        FileReader fr;
+        String url;
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Escribe la ruta del fichero que deseas utilizar: ");
+        url = sc.next();
+        fr = new FileReader(url);
+        BufferedReader br = new BufferedReader(fr);
+        String line = "";
+        line = br.readLine();
+        String[] tipo = new String[2];
+        tipo = line.split(":");
+        if(tipo[0].equals("TIPO") == false || tipo[1].equals("AFND") == false){
+            solucion = null;
+        } else{
+            line = br.readLine();
+            ArrayList<String> estados = new ArrayList();
+            String[] est = line.split(":");
+            est = est[1].split(" ");
+            for(int i = 0; i < est.length; i++){
+                estados.add(est[i].trim());
+            }
+            line = br.readLine();
+            String eini = line.split(":")[1].trim();
+            line = br.readLine();
+            ArrayList<String> efinales = new ArrayList();
+            String[] estfin = line.split(":");
+            estfin = estfin[1].split(" ");
+            for(int i = 0; i < estfin.length; i++){
+                efinales.add(estfin[i].trim());
+            }
+            br.readLine();
+            solucion = new AFND(estados, eini, efinales, new ArrayList<TransicionAFND>(), new ArrayList<TransicionLambda>());
+            boolean b = false;
+            while(b == false){
+                line = br.readLine();
+                if ("TRANSICIONES LAMBDA:".equals(line)) {
+                    b = true;
+                } else {
+                    String[] datos = line.split(" ");
+                    String e1 = datos[0].trim();
+                    String simbol = datos[1].trim();
+                    char sim = simbol.toCharArray()[1];
+                    ArrayList<String> mefin = new ArrayList();
+                    for(int i = 2; i < datos.length; i++){
+                        mefin.add(datos[i].trim());
+                    }
+                    solucion.agregarTransicion(e1, sim, mefin);
+                }
+            }
+            b = false;
+            while(b == false){
+                line = br.readLine();
+                if ("FIN".equals(line)) {
+                    b = true;
+                } else {
+                    String[] datos = line.split(" ");
+                    String e1 = datos[0].trim();
+                    ArrayList<String> mefin = new ArrayList();
+                    for(int i = 1; i < datos.length; i++){
+                        mefin.add(datos[i].trim());
+                    }
+                    solucion.agregarTransicionLambda(e1, mefin);
+                }
+            }
+        }
+        return solucion;
     }
 
     public static AFND pedir() {
@@ -459,9 +531,14 @@ public class AFND {
                     break;
                 }
                 case 2: {
-                    afnd = leeFichero();
-                    break;
+                    try {
+                        afnd = leeFichero();
+                        break;
+                    } catch (IOException ex) {
+                        Logger.getLogger(AFND.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
+
                 default: {
                     break;
                 }
