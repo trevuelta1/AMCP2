@@ -134,21 +134,52 @@ public class AFND {
 
     public ArrayList<String> transicionlambda(ArrayList<String> eini) {
         ArrayList<String> solucion = new ArrayList();
+        solucion.addAll(eini);
         boolean existe = false;
-        for (String e : eini) {
-            int i = 0;
-            boolean b = false;
-            while (i < this.transicioneslambda.size() && b == false) {
-                TransicionLambda t = this.transicioneslambda.get(i);
-                if (t.getEstadoInicial().equals(e) == true) {
-                    for (String s : t.getMacroestadoFinal()) {
-                        solucion.add(s);
+        boolean repetir = true;
+        int tinicial = solucion.size();
+        int tfinal = tinicial * 2;
+        while (repetir == true) {
+            int repeticiones = tfinal - tinicial;
+            tinicial = solucion.size();
+            for (int k = tinicial - repeticiones; k < repeticiones; k++) {
+                int i = 0;
+                boolean b = false;
+                while (i < this.transicioneslambda.size() && b == false) {
+                    TransicionLambda t = this.transicioneslambda.get(i);
+                    if (t.getEstadoInicial().equals(solucion.get(k)) == true) {
+                        for (String s : t.getMacroestadoFinal()) {
+                            solucion.add(s);
+                        }
+                        b = true;
+                        existe = true;
+                    } else {
+                        i++;
                     }
-                    b = true;
-                    existe = true;
-                } else {
-                    i++;
                 }
+                ArrayList<String> añadidos = new ArrayList();
+                añadidos.add(solucion.get(0));
+                tfinal = solucion.size();
+                for (int j = 1; j < tfinal; j++) {
+                    int f = 0;
+                    boolean esta = false;
+                    String elemento = solucion.get(j);
+                    while (f < añadidos.size() && esta == false) {
+                        if (añadidos.get(f).equals(elemento) == true) {
+                            solucion.remove(elemento);
+                            esta = true;
+                        } else {
+                            f++;
+                        }
+                    }
+                    if (esta == false) {
+                        añadidos.add(elemento);
+                    }
+                }
+            }
+            tfinal = solucion.size();
+            if (tinicial == tfinal) {
+                repetir = false;
             }
         }
         if (existe == false) {
@@ -263,8 +294,8 @@ public class AFND {
         }
         return esFinal(macroestado);
     }
-    
-    public static AFND leeFichero(){
+
+    public static AFND leeFichero() {
         return null;
     }
 
@@ -385,14 +416,14 @@ public class AFND {
                                     j++;
                                 }
                             }
-                            if(c == false){
+                            if (c == false) {
                                 correcto = false;
                             }
                         }
-                        if(correcto == true){
+                        if (correcto == true) {
                             afnd.agregarTransicion(est[0], sim, est[1]);
                             System.out.println("Transicion agregada correctamente.");
-                        } else{
+                        } else {
                             System.out.println("ERROR: La transicion no se ha agregado, revisa los estados indicados.");
                         }
                     }
@@ -414,14 +445,14 @@ public class AFND {
                                     j++;
                                 }
                             }
-                            if(c == false){
+                            if (c == false) {
                                 correcto = false;
                             }
                         }
-                        if(correcto == true){
+                        if (correcto == true) {
                             afnd.agregarTransicionLambda(elementos[0], elementos[1]);
                             System.out.println("Transicion Lambda agregada correctamente.");
-                        } else{
+                        } else {
                             System.out.println("ERROR: La transicion Lambda no se ha agregado, revisa los estados indicados.");
                         }
                     }
