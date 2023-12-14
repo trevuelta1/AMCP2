@@ -44,6 +44,7 @@ public class AFND {
     public ArrayList<String> transicion(ArrayList<String> eini, char sim) {
         ArrayList<String> solucion = new ArrayList();
         ArrayList<String> macroestado = transicionlambda(eini);
+        System.out.println(macroestado);
         ArrayList<String> añadidos = new ArrayList(); //evita duplicados en solucion
         boolean existe = false;
         int i = 0;
@@ -82,8 +83,10 @@ public class AFND {
         }
         if (existe == false) {
             solucion = null;
+            System.out.println("No existe transición");
         } else if (existesimbolo == false) {
             solucion = null;
+            System.out.println("No existe símbolo");
         } else {
             solucion = transicionlambda(solucion);
         }
@@ -103,9 +106,11 @@ public class AFND {
         int tinicial = solucion.size();
         int tfinal = tinicial * 2;
         while (repetir == true) {
-            int repeticiones = tfinal - tinicial;
+            int limite = tfinal - tinicial;
             tinicial = solucion.size();
-            for (int k = tinicial - repeticiones; k < repeticiones; k++) {
+            int inicio = tinicial - limite;
+            limite = inicio + limite;
+            for (int k = inicio; k < limite; k++) {
                 int i = 0;
                 boolean b = false;
                 while (i < this.transicioneslambda.size() && b == false) {
@@ -120,25 +125,28 @@ public class AFND {
                     }
                 }
                 ArrayList<String> añadidos = new ArrayList();
+                ArrayList<String> eliminar = new ArrayList();
                 añadidos.add(solucion.get(0));
                 tfinal = solucion.size();
-                if (tfinal > 1) {
-                    for (int j = 1; j < tfinal; j++) {
-                        int f = 0;
-                        boolean esta = false;
-                        String elemento = solucion.get(j);
-                        while (f < añadidos.size() && esta == false) {
-                            if (añadidos.get(f).equals(elemento) == true) {
-                                solucion.remove(elemento);
-                                esta = true;
-                            } else {
-                                f++;
-                            }
-                        }
-                        if (esta == false) {
-                            añadidos.add(elemento);
+                for (int j = 1; j < tfinal; j++) {
+                    int f = 0;
+                    boolean esta = false;
+                    String elemento = solucion.get(j);
+                    while (f < añadidos.size() && esta == false) {
+                        if (añadidos.get(f).equals(elemento) == true) {
+                            esta = true;
+                        } else {
+                            f++;
                         }
                     }
+                    if (esta == false) {
+                        añadidos.add(elemento);
+                    } else{
+                        eliminar.add(elemento);
+                    }
+                }
+                for(String e : eliminar){
+                    solucion.remove(e);
                 }
             }
             tfinal = solucion.size();
@@ -380,10 +388,10 @@ public class AFND {
         int opt = 0;
         Scanner scan = new Scanner(System.in);
         while (opt != 3) {
-            System.out.println("Indica si deseas crear un nuevo AFD o leer uno existente desde fichero.");
+            System.out.println("Indica si deseas crear un nuevo AFND o leer uno existente desde fichero.");
             System.out.println("");
-            System.out.println("1. Crear AFD.");
-            System.out.println("2. Leer AFD desde fichero.");
+            System.out.println("1. Crear AFND.");
+            System.out.println("2. Leer AFND desde fichero.");
             System.out.println("3. Salir.");
             System.out.println("");
             System.out.println("Escoge una opción: ");
