@@ -22,7 +22,6 @@ public class AFND {
     private final ArrayList<String> estados;
     private final ArrayList<String> macroestadoFinal;
     private final String estadoInicial;
-    private final ArrayList<String> macroestadoInicial;
     private ArrayList<TransicionAFND> transiciones;
     private ArrayList<TransicionLambda> transicioneslambda;
 
@@ -32,7 +31,6 @@ public class AFND {
         this.macroestadoFinal = macroestadoFinal;
         this.transiciones = transiciones;
         this.transicioneslambda = transicionesLambda;
-        this.macroestadoInicial = transicionlambda(this.estadoInicial);
     }
 
     public ArrayList<String> transicion(String eini, char sim) {
@@ -43,54 +41,52 @@ public class AFND {
 
     public ArrayList<String> transicion(ArrayList<String> eini, char sim) {
         ArrayList<String> solucion = new ArrayList();
-        ArrayList<String> macroestado = transicionlambda(eini);
-        System.out.println(macroestado);
-        ArrayList<String> añadidos = new ArrayList(); //evita duplicados en solucion
-        boolean existe = false;
-        int i = 0;
-        boolean b = false;
-        boolean existesimbolo = false;
-        while (i < this.transiciones.size() && b == false) {
-            TransicionAFND t = this.transiciones.get(i);
-            if (sim == t.getSimbolo()) {
-                existesimbolo = true;
-            }
-            for (String m : macroestado) {
+        ArrayList<String> macroestado = new ArrayList();
+        macroestado = transicionlambda(eini);
+        for (String m : macroestado) {
+            int i = 0;
+            boolean b = false;
+            while (i < this.transiciones.size() && b == false) {
+                TransicionAFND t = this.transiciones.get(i);
                 if (t.getEstadoInicial().equals(m) == true && t.getSimbolo() == sim) {
-                    for (String s : t.getMacroestadoFinal()) {
-                        boolean a = false;
-                        if (añadidos.isEmpty() == false) {
-                            int j = 0;
-                            while (j < añadidos.size() && a == false) {
-                                if (añadidos.get(j).equals(s) == true) {
-                                    a = true;
-                                } else {
-                                    j++;
-                                }
-                            }
-                        }
-                        if (a == false) {
-                            solucion.add(s);
-                            añadidos.add(s);
-                        }
+                    for (String e : t.getMacroestadoFinal()) {
+                        solucion.add(e);
                     }
                     b = true;
-                    existe = true;
                 } else {
                     i++;
                 }
             }
         }
-        if (existe == false) {
-            solucion = null;
-            System.out.println("No existe transición");
-        } else if (existesimbolo == false) {
-            solucion = null;
-            System.out.println("No existe símbolo");
+        if (solucion.isEmpty() == true) {
+            return null;
         } else {
-            solucion = transicionlambda(solucion);
+            ArrayList<String> añadidos = new ArrayList();
+            ArrayList<String> eliminar = new ArrayList();
+            añadidos.add(solucion.get(0));
+            int tamaño = solucion.size();
+            for (int j = 1; j < tamaño; j++) {
+                int f = 0;
+                boolean esta = false;
+                String elemento = solucion.get(j);
+                while (f < añadidos.size() && esta == false) {
+                    if (añadidos.get(f).equals(elemento) == true) {
+                        esta = true;
+                    } else {
+                        f++;
+                    }
+                }
+                if (esta == false) {
+                    añadidos.add(elemento);
+                } else {
+                    eliminar.add(elemento);
+                }
+            }
+            for (String e : eliminar) {
+                solucion.remove(e);
+            }
+            return transicionlambda(solucion);
         }
-        return solucion;
     }
 
     public ArrayList<String> transicionlambda(String eini) {
@@ -141,11 +137,11 @@ public class AFND {
                     }
                     if (esta == false) {
                         añadidos.add(elemento);
-                    } else{
+                    } else {
                         eliminar.add(elemento);
                     }
                 }
-                for(String e : eliminar){
+                for (String e : eliminar) {
                     solucion.remove(e);
                 }
             }
@@ -257,7 +253,8 @@ public class AFND {
 
     public boolean reconocer(String cadena) {
         char[] simbolo = cadena.toCharArray();
-        ArrayList<String> macroestado = this.macroestadoInicial;
+        ArrayList<String> macroestado = new ArrayList();
+        macroestado.add(this.estadoInicial);
         int i = 0;
         boolean error = false;
         while (i < simbolo.length && error == false) {
@@ -268,7 +265,7 @@ public class AFND {
             i++;
         }
         if (error == true) {
-            System.out.println("CADENA CON CARACTERES NO VÁLIDOS.");
+            System.out.println("CADENA NO VÁLIDA.");
             return false;
         } else {
             boolean fin = esFinal(macroestado);
@@ -283,20 +280,25 @@ public class AFND {
 
     public boolean reconocerPasoAPaso(String cadena) {
         char[] simbolo = cadena.toCharArray();
-        ArrayList<String> macroestado = this.macroestadoInicial;
+        ArrayList<String> macroestado = new ArrayList();
+        macroestado.add(this.estadoInicial);
         int i = 0;
         boolean error = false;
         while (i < simbolo.length && error == false) {
+            System.out.println("");
+            System.out.println("Transición " + (i + 1) + ":");
+            System.out.println("----------------------------");
+            System.out.println("Macroestado inicial: " + macroestado);
             macroestado = transicion(macroestado, simbolo[i]);
             if (macroestado == null) {
                 error = true;
             }
             if (error == false) {
-                System.out.println("Símbolo: '" + simbolo[i] + "'.");
+                System.out.println("Consume símbolo: '" + simbolo[i] + "'.");
                 System.out.println("Estados accesibles:");
                 System.out.println(macroestado);
             } else {
-                System.out.println("CADENA CON CARACTERES NO VÁLIDOS.");
+                System.out.println("CADENA NO VÁLIDA.");
             }
             i++;
         }
@@ -398,7 +400,7 @@ public class AFND {
             opt = scan.nextInt();
             switch (opt) {
                 case 1: {
-                    System.out.println("Indica el nombre de cada uno de los estados del autómata separados por una coma (Ej: q1, q2, q3): ");
+                    System.out.println("Indica el nombre de cada uno de los estados del autómata separados por una coma (Ej: q1,q2,q3): ");
                     String nombres = scan.next();
                     ArrayList<String> estados = new ArrayList();
                     ArrayList<String> añadidos = new ArrayList();
@@ -442,7 +444,7 @@ public class AFND {
                     }
                     ArrayList<String> estadosf = new ArrayList();
                     ArrayList<String> añadidosf = new ArrayList();
-                    System.out.println("Indica el nombre de cada uno de los estados finales separados por una coma (Ej: q1, q2, q3): ");
+                    System.out.println("Indica el nombre de cada uno de los estados finales separados por una coma (Ej: q1,q2,q3): ");
                     String nfinales = scan.next();
                     String[] nomfinales = nfinales.split(",");
                     for (String s : nomfinales) {
@@ -478,8 +480,8 @@ public class AFND {
                     }
                     afnd = new AFND(estados, eini, estadosf, new ArrayList<TransicionAFND>(), new ArrayList<TransicionLambda>());
                     System.out.println("");
-                    System.out.println("Añade las transiciones que desees con el siguiente formato: estado1, símbolo, estado2.");
-                    System.out.println("Ten en consideración que el símbolo debe ser un único carácter (Ej: q1, p, q2).");
+                    System.out.println("Añade las transiciones que desees con el siguiente formato: estado1,símbolo,estado2.");
+                    System.out.println("Ten en consideración que el símbolo debe ser un único carácter (Ej: q1,p,q2).");
                     System.out.println("Cuando no desees introducir más transiciones, escribe la palabra SALIR y pulsa Enter.");
                     String cadenatransicion = "";
                     while (cadenatransicion.equals("SALIR") == false && cadenatransicion.equals("Salir") == false && cadenatransicion.equals("salir") == false) {
@@ -515,7 +517,7 @@ public class AFND {
                         }
                     }
                     System.out.println("");
-                    System.out.println("Añade ahora las transiciones lambda que desees con el siguiente formato: estado1, estado2 (Ej: q1, q2).");
+                    System.out.println("Añade ahora las transiciones lambda que desees con el siguiente formato: estado1,estado2 (Ej: q1,q2).");
                     System.out.println("Cuando no desees introducir más transiciones, escribe la palabra SALIR y pulsa Enter.");
                     cadenatransicion = "";
                     while (cadenatransicion.equals("SALIR") == false && cadenatransicion.equals("Salir") == false && cadenatransicion.equals("salir") == false) {
@@ -546,6 +548,12 @@ public class AFND {
                             }
                         }
                     }
+                    System.out.println("");
+                    System.out.println("");
+                    System.out.println("Fichero leído correctamente, pulsa 3 para salir y poder trabajar con el autómata.");
+                    System.out.println("ATENCIÓN: ES NECESARIO SALIR DE ESTE MENÚ PARA PODER TRABAJAR CON EL AUTÓMATA, PULSA 3 PARA CONTINUAR.");
+                    System.out.println("");
+                    System.out.println("");
                     break;
                 }
                 case 2: {
@@ -555,6 +563,7 @@ public class AFND {
                             System.out.println("");
                             System.out.println("");
                             System.out.println("Fichero leído correctamente, pulsa 3 para salir y poder trabajar con el autómata.");
+                            System.out.println("ATENCIÓN: ES NECESARIO SALIR DE ESTE MENÚ PARA PODER TRABAJAR CON EL AUTÓMATA, PULSA 3 PARA CONTINUAR.");
                             System.out.println("");
                             System.out.println("");
                         }

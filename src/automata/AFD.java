@@ -95,8 +95,11 @@ public class AFD {
         char[] simbolos = cadena.toCharArray();
         boolean cadenaErronea = false;
         int i = 0;
-        System.out.println("Estado inicial: " + estadoActual);
         while (i < simbolos.length && estadoActual.equals("No encontrada") == false) {
+            System.out.println("");
+            System.out.println("Transición " + (i + 1) + ":");
+            System.out.println("----------------------------");
+            System.out.println("Estado inicial: " + estadoActual);
             estadoActual = transicion(estadoActual, simbolos[i]);
             if (estadoActual.equals("No encontrada") == true) {
                 cadenaErronea = true;
@@ -187,7 +190,7 @@ public class AFD {
             opt = scan.nextInt();
             switch (opt) {
                 case 1: {
-                    System.out.println("Indica el nombre de cada uno de los estados del autómata separados por una coma (Ej: q1, q2, q3): ");
+                    System.out.println("Indica el nombre de cada uno de los estados del autómata separados por una coma (Ej: q1,q2,q3): ");
                     String nombres = scan.next();
                     ArrayList<String> estados = new ArrayList();
                     ArrayList<String> añadidos = new ArrayList();
@@ -231,7 +234,7 @@ public class AFD {
                     }
                     ArrayList<String> estadosf = new ArrayList();
                     ArrayList<String> añadidosf = new ArrayList();
-                    System.out.println("Indica el nombre de cada uno de los estados finales separados por una coma (Ej: q1, q2, q3): ");
+                    System.out.println("Indica el nombre de cada uno de los estados finales separados por una coma (Ej: q1,q2,q3): ");
                     String nfinales = scan.next();
                     String[] nomfinales = nfinales.split(",");
                     for (String s : nomfinales) {
@@ -267,8 +270,8 @@ public class AFD {
                     }
                     afd = new AFD(estados, eini, estadosf, new ArrayList<TransicionAFD>());
                     System.out.println("");
-                    System.out.println("Añade las transiciones que desees con el siguiente formato: estado1, símbolo, estado2.");
-                    System.out.println("Ten en consideración que el símbolo debe ser un único carácter (Ej: q1, p, q2).");
+                    System.out.println("Añade las transiciones que desees con el siguiente formato: estado1,símbolo,estado2.");
+                    System.out.println("Ten en consideración que el símbolo debe ser un único carácter (Ej: q1,p,q2).");
                     System.out.println("Cuando no desees introducir más transiciones, escribe la palabra SALIR y pulsa Enter.");
                     String cadenatransicion = "";
                     while (cadenatransicion.equals("SALIR") == false && cadenatransicion.equals("Salir") == false && cadenatransicion.equals("salir") == false) {
@@ -303,15 +306,22 @@ public class AFD {
                             }
                         }
                     }
+                    System.out.println("");
+                    System.out.println("");
+                    System.out.println("Fichero leído correctamente, pulsa 3 para salir y poder trabajar con el autómata.");
+                    System.out.println("ATENCIÓN: ES NECESARIO SALIR DE ESTE MENÚ PARA PODER TRABAJAR CON EL AUTÓMATA, PULSA 3 PARA CONTINUAR.");
+                    System.out.println("");
+                    System.out.println("");
                     break;
                 }
                 case 2: {
                     try {
                         afd = leeFichero();
-                        if(afd != null){
+                        if (afd != null) {
                             System.out.println("");
                             System.out.println("");
                             System.out.println("Fichero leído correctamente, pulsa 3 para salir y poder trabajar con el autómata.");
+                            System.out.println("ATENCIÓN: ES NECESARIO SALIR DE ESTE MENÚ PARA PODER TRABAJAR CON EL AUTÓMATA, PULSA 3 PARA CONTINUAR.");
                             System.out.println("");
                             System.out.println("");
                         }
