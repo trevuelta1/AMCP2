@@ -8,9 +8,9 @@ import automata.*;
 import java.util.Scanner;
 
 /**
- *
- * @author USUARIO1
- */
+ * Clase Ejercicio con el método main.
+ * @author Toni Revuelta
+ **/
 public class Ejercicio {
 
     /**

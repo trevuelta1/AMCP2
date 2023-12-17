@@ -14,9 +14,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author usuario
- */
+ * Clase AFND, que almacena los datos necesarios de los autómatas finitos no deterministas.
+ * @author Toni Revuelta
+ **/
 public class AFND {
 
     private final ArrayList<String> estados;
@@ -24,7 +24,14 @@ public class AFND {
     private final String estadoInicial;
     private ArrayList<TransicionAFND> transiciones;
     private ArrayList<TransicionLambda> transicioneslambda;
-
+    /**
+    * Constructor de la clase AFND.
+    * @param estados Lista de estados del autómata
+    * @param estadoInicial Estado inicial
+    * @param macroestadoFinal Lista de estados finales
+    * @param transiciones Lista de transiciones
+    * @param transicionesLambda Lista de transiciones Lambda
+    **/
     public AFND(ArrayList<String> estados, String estadoInicial, ArrayList<String> macroestadoFinal, ArrayList<TransicionAFND> transiciones, ArrayList<TransicionLambda> transicionesLambda) {
         this.estados = estados;
         this.estadoInicial = estadoInicial;
@@ -32,13 +39,23 @@ public class AFND {
         this.transiciones = transiciones;
         this.transicioneslambda = transicionesLambda;
     }
-
+    /**
+    * Devuelve todos los estados a los que se puede llegar desde el estado inicial pasado por parámetro, consumiendo el símbolo también pasado por parámetro.
+    * @param eini Estado inicial de la transición
+    * @param sim Símbolo a consumir
+    * @return Lista de estados accesibles o null si no hay ninguno
+    **/
     public ArrayList<String> transicion(String eini, char sim) {
         ArrayList<String> macroestado = new ArrayList();
         macroestado.add(eini);
         return transicion(macroestado, sim);
     }
-
+    /**
+     * Devuelve todos los estados a los que se puede llegar desde cada uno de los estados del macroestado inicial pasado por parámetro, consumiendo el símbolo también pasado por parámetro.
+     * @param eini Macroestado inicial
+     * @param sim Símbolo a consumir
+     * @return Lista de estados accesibles o null si no hay ninguno
+     **/
     public ArrayList<String> transicion(ArrayList<String> eini, char sim) {
         ArrayList<String> solucion = new ArrayList();
         ArrayList<String> macroestado = new ArrayList();
@@ -88,13 +105,21 @@ public class AFND {
             return transicionlambda(solucion);
         }
     }
-
+    /**
+     * Devuelve el resultado de aplicar Lambda-Clausura al estado inicial pasado por parámetro, es decir, el propio estado más todos los estados accesibles a través de transiciones Lambda.
+     * @param eini Estado inicial
+     * @return Lista de estados pertenecientes al Lambda-Clausura del estado inicial
+     **/
     public ArrayList<String> transicionlambda(String eini) {
         ArrayList<String> est = new ArrayList();
         est.add(eini);
         return transicionlambda(est);
     }
-
+    /**
+     * Devuelve el resultado de aplicar Lambda-Clausura al macroestado inicial pasado por parámetro, es decir, cada uno de los estados del macroestado más todos los estados accesibles a través de transiciones Lambda.
+     * @param eini Macroestado inicial
+     * @return Lista de estados pertenecientes al Lambda-Clausura del macroestado inicial
+     **/
     public ArrayList<String> transicionlambda(ArrayList<String> eini) {
         ArrayList<String> solucion = new ArrayList();
         solucion.addAll(eini);
@@ -152,12 +177,22 @@ public class AFND {
         }
         return solucion;
     }
-
+    /**
+     * Agrega una nueva transición al autómata.
+     * @param eini Estado inicial de la transición
+     * @param sim Símbolo a consumir
+     * @param efin Estados finales de la transición
+     **/
     public void agregarTransicion(String eini, char sim, ArrayList<String> efin) {
         TransicionAFND t = new TransicionAFND(eini, sim, efin);
         this.transiciones.add(t);
     }
-
+    /**
+     * Agrega una nueva transición al autómata.
+     * @param eini Estado inicial de la transición
+     * @param sim Símbolo a consumir
+     * @param efin Estado final de la transición
+     **/
     public void agregarTransicion(String eini, char sim, String efin) {
         int i = 0;
         boolean b = false;
@@ -188,12 +223,20 @@ public class AFND {
             this.transiciones.add(tran);
         }
     }
-
+    /**
+     * Agrega una nueva transición Lambda al autómata.
+     * @param eini Estado inicial de la transición
+     * @param efin Estados finales de la transición
+     **/
     public void agregarTransicionLambda(String eini, ArrayList<String> efin) {
         TransicionLambda t = new TransicionLambda(eini, efin);
         this.transicioneslambda.add(t);
     }
-
+    /**
+     * Agrega una nueva transición Lambda al autómata.
+     * @param eini Estado inicial de la transición
+     * @param efin Estado final de la transición
+     **/
     public void agregarTransicionLambda(String eini, String efin) {
         int i = 0;
         boolean b = false;
@@ -224,7 +267,11 @@ public class AFND {
             this.transicioneslambda.add(tran);
         }
     }
-
+    /**
+     * Comprueba si el estado pasado por parámetro es un estado final.
+     * @param estado Estado a comprobar
+     * @return true si es final, false si no lo es
+     **/
     public boolean esFinal(String estado) {
         boolean b = false;
         int i = 0;
@@ -237,7 +284,11 @@ public class AFND {
         }
         return b;
     }
-
+    /**
+     * Comprueba si existe algún estado final en el macroestado pasado por parámetro.
+     * @param macroestado Macroestado a comprobar
+     * @return true si existe algún estado final, false si no existe ninguno
+     **/
     public boolean esFinal(ArrayList<String> macroestado) {
         boolean b = false;
         int i = 0;
@@ -250,7 +301,11 @@ public class AFND {
         }
         return b;
     }
-
+    /**
+     * Comprueba la cadena de caracteres pasada por parámetro, que podrá ser aceptada si, tras consumir todos los símbolos, se llega a un estado final; rechazada si, tras consumir todos los símbolos, se llega a un estado que no es final; o no válida si no se pueden llegar a consumir todos los símbolos debido a cualquier motivo.
+     * @param cadena Cadena a comprobar
+     * @return true si la cadena es aceptada, false si es rechazada o no válida
+     **/
     public boolean reconocer(String cadena) {
         char[] simbolo = cadena.toCharArray();
         ArrayList<String> macroestado = new ArrayList();
@@ -277,9 +332,14 @@ public class AFND {
             return fin;
         }
     }
-
+    /**
+     * Comprueba paso a paso la cadena de caracteres pasada por parámetro, que podrá ser aceptada si, tras consumir todos los símbolos, se llega a un estado final; rechazada si, tras consumir todos los símbolos, se llega a un estado que no es final; o no válida si no se pueden llegar a consumir todos los símbolos debido a cualquier motivo.
+     * @param cadena Cadena a comprobar
+     * @return true si la cadena es aceptada, false si es rechazada o no válida
+     **/
     public boolean reconocerPasoAPaso(String cadena) {
         char[] simbolo = cadena.toCharArray();
+        Scanner scan = new Scanner(System.in);
         ArrayList<String> macroestado = new ArrayList();
         macroestado.add(this.estadoInicial);
         int i = 0;
@@ -297,6 +357,7 @@ public class AFND {
                 System.out.println("Consume símbolo: '" + simbolo[i] + "'.");
                 System.out.println("Estados accesibles:");
                 System.out.println(macroestado);
+                scan.nextLine();
             } else {
                 System.out.println("CADENA NO VÁLIDA.");
             }
@@ -314,7 +375,12 @@ public class AFND {
             return fin;
         }
     }
-
+    /**
+     * Lee datos desde fichero y devuelve un AFND con estos datos.
+     * @return AFND
+     * @throws FileNotFoundException
+     * @throws IOException 
+     **/
     public static AFND leeFichero() throws FileNotFoundException, IOException {
         AFND solucion;
         FileReader fr;
@@ -384,7 +450,10 @@ public class AFND {
         }
         return solucion;
     }
-
+    /**
+     * Pide al usuario datos por teclado y genera un AFND con esos datos.
+     * @return AFND
+     **/
     public static AFND pedir() {
         AFND afnd = null;
         int opt = 0;
@@ -580,7 +649,9 @@ public class AFND {
         }
         return afnd;
     }
-
+    /**
+     * Muestra los datos del AFND actual.
+     **/
     public void ver() {
         System.out.println("");
         System.out.println("Estados: " + this.estados);

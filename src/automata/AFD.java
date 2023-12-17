@@ -14,23 +14,34 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author usuario
- */
+ * Clase AFD, que almacena los datos necesarios de los autómatas finitos deterministas.
+ * @author Toni Revuelta
+ **/
 public class AFD {
 
     private final ArrayList<String> estados;
     private final ArrayList<String> estadosFinales;
     private final String estadoInicial;
     private ArrayList<TransicionAFD> transiciones;
-
+    /**
+    * Constructor de la clase AFD.
+    * @param estados Lista de estados del autómata
+    * @param estadoInicial Estado inicial
+    * @param estadosFinales Lista de estados finales
+    * @param transiciones Lista de transiciones
+    **/
     public AFD(ArrayList<String> estados, String estadoInicial, ArrayList<String> estadosFinales, ArrayList<TransicionAFD> transiciones) {
         this.estados = estados;
         this.estadoInicial = estadoInicial;
         this.estadosFinales = estadosFinales;
         this.transiciones = transiciones;
     }
-
+    /**
+    * Devuelve el estado final de la transición que utiliza el estado inicial pasado por parámetro, consumiendo el símbolo también pasado por parámetro.
+    * @param eini Estado inicial de la transición
+    * @param sim Símbolo a consumir
+    * @return Estado final de la transición
+    **/
     public String transicion(String eini, char sim) {
         String solucion = "No encontrada";
         boolean b = false;
@@ -45,7 +56,11 @@ public class AFD {
         }
         return solucion;
     }
-
+    /**
+     * Comprueba si el estado pasado por parámetro es un estado final.
+     * @param estado Estado a comprobar
+     * @return true si es final, false si no lo es
+     **/
     public boolean esFinal(String estado) {
         boolean b = false;
         int i = 0;
@@ -58,12 +73,21 @@ public class AFD {
         }
         return b;
     }
-
+    /**
+     * Agrega una nueva transición al autómata.
+     * @param eini Estado inicial de la transición
+     * @param sim Símbolo a consumir
+     * @param efin Estado final de la transición
+     **/
     public void agregarTransicion(String eini, char sim, String efin) {
         TransicionAFD transicion = new TransicionAFD(eini, sim, efin);
         this.transiciones.add(transicion);
     }
-
+    /**
+     * Comprueba la cadena de caracteres pasada por parámetro, que podrá ser aceptada si, tras consumir todos los símbolos, se llega a un estado final; rechazada si, tras consumir todos los símbolos, se llega a un estado que no es final; o no válida si no se pueden llegar a consumir todos los símbolos debido a cualquier motivo.
+     * @param cadena Cadena a comprobar
+     * @return true si la cadena es aceptada, false si es rechazada o no válida
+     **/
     public boolean reconocer(String cadena) {
         String estadoActual = this.estadoInicial;
         char[] simbolos = cadena.toCharArray();
@@ -89,9 +113,14 @@ public class AFD {
             return fin;
         }
     }
-
+    /**
+     * Comprueba paso a paso la cadena de caracteres pasada por parámetro, que podrá ser aceptada si, tras consumir todos los símbolos, se llega a un estado final; rechazada si, tras consumir todos los símbolos, se llega a un estado que no es final; o no válida si no se pueden llegar a consumir todos los símbolos debido a cualquier motivo.
+     * @param cadena Cadena a comprobar
+     * @return true si la cadena es aceptada, false si es rechazada o no válida
+     **/
     public boolean reconocerPasoAPaso(String cadena) {
         String estadoActual = this.estadoInicial;
+        Scanner scan = new Scanner(System.in);
         char[] simbolos = cadena.toCharArray();
         boolean cadenaErronea = false;
         int i = 0;
@@ -106,6 +135,7 @@ public class AFD {
             }
             if (cadenaErronea == false) {
                 System.out.println("Transición a estado " + estadoActual + " consumiendo símbolo '" + simbolos[i] + "'.");
+                scan.nextLine();
             }
             i++;
         }
@@ -122,7 +152,12 @@ public class AFD {
             return fin;
         }
     }
-
+    /**
+     * Lee datos desde fichero y devuelve un AFD con estos datos.
+     * @return AFD
+     * @throws FileNotFoundException
+     * @throws IOException 
+     **/
     public static AFD leeFichero() throws FileNotFoundException, IOException {
         AFD solucion;
         FileReader fr;
@@ -174,7 +209,10 @@ public class AFD {
         }
         return solucion;
     }
-
+    /**
+     * Pide al usuario datos por teclado y genera un AFD con esos datos.
+     * @return AFD
+     **/
     public static AFD pedir() {
         AFD afd = null;
         int opt = 0;
@@ -338,7 +376,9 @@ public class AFD {
         }
         return afd;
     }
-
+    /**
+     * Muestra los datos del AFD actual.
+     **/
     public void ver() {
         System.out.println("");
         System.out.println("Estados: " + this.estados);
