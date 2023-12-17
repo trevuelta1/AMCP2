@@ -653,20 +653,23 @@ public class AFND {
      * Muestra los datos del AFND actual.
      **/
     public void ver() {
-        System.out.println("");
-        System.out.println("Estados: " + this.estados);
-        System.out.println("Estado inicial: " + this.estadoInicial);
-        System.out.println("Estados finales: " + this.macroestadoFinal);
-        System.out.println("");
-        System.out.println("Transiciones:");
+        System.out.println(toString());
+    }
+    /**
+     * Devuelve un String con los datos del autómata.
+     * @return String con los datos del autómata.
+     **/
+    @Override
+    public String toString(){
+        String solucion =  "\nEstados: " + this.estados + "\nEstado inicial: " + this.estadoInicial + "\nEstados finales: " + this.macroestadoFinal + "\n\nTransiciones:\n";
         for (int i = 0; i < this.transiciones.size(); i++) {
-            System.out.println(this.transiciones.get(i).toString());
+            solucion = solucion + this.transiciones.get(i).toString() + "\n";
         }
-        System.out.println("");
-        System.out.println("Transiciones lambda:");
+        solucion = solucion + "\nTransiciones Lambda:\n";
         for (int i = 0; i < this.transicioneslambda.size(); i++) {
-            System.out.println(this.transicioneslambda.get(i).toString());
+            solucion = solucion + this.transicioneslambda.get(i).toString() + "\n";
         }
-        System.out.println("");
+        solucion = solucion + "\n";
+        return solucion;
     }
 }

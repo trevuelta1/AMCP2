@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Clase AFD, que almacena los datos necesarios de los autómatas finitos deterministas.
  * @author Toni Revuelta
  **/
-public class AFD {
+public class AFD implements Proceso{
 
     private final ArrayList<String> estados;
     private final ArrayList<String> estadosFinales;
@@ -61,6 +61,7 @@ public class AFD {
      * @param estado Estado a comprobar
      * @return true si es final, false si no lo es
      **/
+    @Override
     public boolean esFinal(String estado) {
         boolean b = false;
         int i = 0;
@@ -88,6 +89,7 @@ public class AFD {
      * @param cadena Cadena a comprobar
      * @return true si la cadena es aceptada, false si es rechazada o no válida
      **/
+    @Override
     public boolean reconocer(String cadena) {
         String estadoActual = this.estadoInicial;
         char[] simbolos = cadena.toCharArray();
@@ -380,15 +382,19 @@ public class AFD {
      * Muestra los datos del AFD actual.
      **/
     public void ver() {
-        System.out.println("");
-        System.out.println("Estados: " + this.estados);
-        System.out.println("Estado inicial: " + this.estadoInicial);
-        System.out.println("Estados finales: " + this.estadosFinales);
-        System.out.println("");
-        System.out.println("Transiciones:");
+        System.out.println(toString());
+    }
+    /**
+     * Devuelve un String con los datos del autómata.
+     * @return String con los datos del autómata.
+     **/
+    @Override
+    public String toString(){
+        String solucion =  "\nEstados: " + this.estados + "\nEstado inicial: " + this.estadoInicial + "\nEstados finales: " + this.estadosFinales + "\n\nTransiciones:\n";
         for (int i = 0; i < this.transiciones.size(); i++) {
-            System.out.println(this.transiciones.get(i).toString());
+            solucion = solucion + this.transiciones.get(i).toString() + "\n";
         }
-        System.out.println("");
+        solucion = solucion + "\n";
+        return solucion;
     }
 }
